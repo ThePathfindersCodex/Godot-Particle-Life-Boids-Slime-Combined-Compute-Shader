@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://cxyr0ai84t2xu"
+path="res://.godot/imported/particle_boids_slime.glsl-feb7b88a7e548f34c45700683bb3eaa1.res"
+
+[deps]
+
+source_file="res://particle_boids_slime.glsl"
+dest_files=["res://.godot/imported/particle_boids_slime.glsl-feb7b88a7e548f34c45700683bb3eaa1.res"]
+
+[params]
+

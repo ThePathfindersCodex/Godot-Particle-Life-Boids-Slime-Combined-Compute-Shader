@@ -1,8 +1,19 @@
-[gd_scene load_steps=6 format=3 uid="uid://dttimedg6wf3x"]
+[gd_scene format=3 uid="uid://dttimedg6wf3x"]
 
 [ext_resource type="Script" uid="uid://bnu3l1ea7e55e" path="res://main.gd" id="1_h2yge"]
-[ext_resource type="Script" uid="uid://cetpw8ci6emy4" path="res://particle_boids.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://cetpw8ci6emy4" path="res://particle_boids_slime.gd" id="1_ig7tw"]
+[ext_resource type="Shader" uid="uid://bx6p6pscw84jj" path="res://trail_draw.gdshader" id="2_lquwl"]
 [ext_resource type="Script" uid="uid://danbgaf8xni3k" path="res://LabelFPS.gd" id="3_h2yge"]
+[ext_resource type="Texture2D" uid="uid://1wtkcv2wfd70" path="res://gradients/topographic.tres" id="3_lquwl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_272bh"]
+shader = ExtResource("2_lquwl")
+shader_parameter/gradient_texture = ExtResource("3_lquwl")
+shader_parameter/camera_center = Vector2(0, 0)
+shader_parameter/texture_size = Vector2(0, 0)
+shader_parameter/world_to_texture = 0.1
+shader_parameter/zoom = 1.0
+shader_parameter/alpha = 1.0
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_ig7tw"]
 
@@ -13,16 +24,16 @@ expand_margin_top = 5.0
 expand_margin_right = 5.0
 expand_margin_bottom = 5.0
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=485349268]
 script = ExtResource("1_h2yge")
 
-[node name="MMI" type="MultiMeshInstance2D" parent="."]
+[node name="MMI" type="MultiMeshInstance2D" parent="." unique_id=214221357]
 unique_name_in_owner = true
 position = Vector2(42, 94)
 
-[node name="ParticleBoids" type="TextureRect" parent="."]
+[node name="ParticleBoidsSlime" type="TextureRect" parent="." unique_id=965107561]
 unique_name_in_owner = true
-visible = false
+material = SubResource("ShaderMaterial_272bh")
 offset_left = 42.0
 offset_top = 94.0
 offset_right = 842.0
@@ -30,7 +41,7 @@ offset_bottom = 894.0
 texture = SubResource("PlaceholderTexture2D_ig7tw")
 script = ExtResource("1_ig7tw")
 
-[node name="LabelFPS" type="Label" parent="."]
+[node name="LabelFPS" type="Label" parent="." unique_id=1394768564]
 offset_left = 14.0
 offset_top = 916.0
 offset_right = 54.0
@@ -38,7 +49,30 @@ offset_bottom = 939.0
 text = "FPS"
 script = ExtResource("3_h2yge")
 
-[node name="SliderSimMix" type="HSlider" parent="."]
+[node name="DrawFlags" type="HBoxContainer" parent="." unique_id=533355677]
+offset_left = 164.0
+offset_top = 909.0
+offset_right = 514.0
+offset_bottom = 940.0
+
+[node name="CheckBoxShowParticles" type="CheckBox" parent="DrawFlags" unique_id=2024361475]
+layout_mode = 2
+focus_mode = 0
+button_pressed = true
+text = "Show Particles"
+
+[node name="CheckBox2ShowField" type="CheckBox" parent="DrawFlags" unique_id=1036470887]
+layout_mode = 2
+focus_mode = 0
+button_pressed = true
+text = "Show Field"
+
+[node name="OptionButtonGradients" type="OptionButton" parent="DrawFlags" unique_id=753941293]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+
+[node name="SliderSimMix" type="HSlider" parent="." unique_id=7624373]
 unique_name_in_owner = true
 offset_left = 1074.0
 offset_top = 32.0
@@ -51,7 +85,7 @@ value = 0.5
 tick_count = 11
 ticks_on_borders = true
 
-[node name="LabelSimSplit" type="Label" parent="."]
+[node name="LabelSimSplit" type="Label" parent="." unique_id=1791759984]
 unique_name_in_owner = true
 offset_left = 1074.0
 offset_top = 14.0
@@ -60,34 +94,34 @@ offset_bottom = 37.0
 text = "50% Boids - 50% Particle Life"
 horizontal_alignment = 1
 
-[node name="SimControls" type="PanelContainer" parent="."]
+[node name="SimControls" type="PanelContainer" parent="." unique_id=1469917454]
 offset_left = 19.0
 offset_top = 20.0
 offset_right = 961.0
 offset_bottom = 60.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_h2yge")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="SimControls"]
+[node name="HBoxContainer" type="HBoxContainer" parent="SimControls" unique_id=676843874]
 unique_name_in_owner = true
 modulate = Color(0.810502, 1, 0.997018, 1)
 layout_mode = 2
 
-[node name="ButtonPauseResume" type="Button" parent="SimControls/HBoxContainer"]
+[node name="ButtonPauseResume" type="Button" parent="SimControls/HBoxContainer" unique_id=101304791]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "PAUSE"
 
-[node name="VSeparator" type="VSeparator" parent="SimControls/HBoxContainer"]
+[node name="VSeparator" type="VSeparator" parent="SimControls/HBoxContainer" unique_id=1115574523]
 custom_minimum_size = Vector2(20, 0)
 layout_mode = 2
 
-[node name="ButtonRestart" type="Button" parent="SimControls/HBoxContainer"]
+[node name="ButtonRestart" type="Button" parent="SimControls/HBoxContainer" unique_id=2143406049]
 layout_mode = 2
 focus_mode = 0
 text = "RESTART"
 
-[node name="OptionStartMethod" type="OptionButton" parent="SimControls/HBoxContainer"]
+[node name="OptionStartMethod" type="OptionButton" parent="SimControls/HBoxContainer" unique_id=465316155]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
@@ -110,7 +144,7 @@ popup/item_6/id = 6
 popup/item_7/text = "Bands Symmetric"
 popup/item_7/id = 7
 
-[node name="OptionStartSpeciesCount" type="OptionButton" parent="SimControls/HBoxContainer"]
+[node name="OptionStartSpeciesCount" type="OptionButton" parent="SimControls/HBoxContainer" unique_id=157874564]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
@@ -140,13 +174,13 @@ popup/item_9/id = 9
 popup/item_10/text = "Species: 10"
 popup/item_10/id = 10
 
-[node name="CheckBoxLockMatrix" type="CheckBox" parent="SimControls/HBoxContainer"]
+[node name="CheckBoxLockMatrix" type="CheckBox" parent="SimControls/HBoxContainer" unique_id=582141370]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "Lock Matrix"
 
-[node name="OptionStartInteractionRange" type="OptionButton" parent="SimControls/HBoxContainer"]
+[node name="OptionStartInteractionRange" type="OptionButton" parent="SimControls/HBoxContainer" unique_id=1447658203]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
@@ -162,7 +196,7 @@ popup/item_2/id = 2
 popup/item_3/text = "Matrix Range: 3"
 popup/item_3/id = 3
 
-[node name="OptionStartRadiusMultiplier" type="OptionButton" parent="SimControls/HBoxContainer"]
+[node name="OptionStartRadiusMultiplier" type="OptionButton" parent="SimControls/HBoxContainer" unique_id=2138599111]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
@@ -178,12 +212,12 @@ popup/item_2/id = 2
 popup/item_3/text = "Start Size: 3"
 popup/item_3/id = 3
 
-[node name="OptionStartPointCount" type="OptionButton" parent="SimControls/HBoxContainer"]
+[node name="OptionStartPointCount" type="OptionButton" parent="SimControls/HBoxContainer" unique_id=310376466]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 selected = 2
-item_count = 6
+item_count = 5
 popup/item_0/text = "256"
 popup/item_0/id = 0
 popup/item_1/text = "512"
@@ -194,124 +228,122 @@ popup/item_3/text = "15360"
 popup/item_3/id = 3
 popup/item_4/text = "25600"
 popup/item_4/id = 4
-popup/item_5/text = "51200"
-popup/item_5/id = 5
 
-[node name="SimParameters" type="GridContainer" parent="."]
-offset_left = 836.0
+[node name="SimParameters" type="GridContainer" parent="." unique_id=1681967463]
+offset_left = 843.0
 offset_top = 96.0
-offset_right = 1344.0
-offset_bottom = 628.0
+offset_right = 1351.0
+offset_bottom = 656.0
 columns = 3
 
-[node name="LabelPoints" type="Label" parent="SimParameters"]
+[node name="LabelPoints" type="Label" parent="SimParameters" unique_id=408348210]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "POINTS"
 horizontal_alignment = 2
 
-[node name="LabelPointsValue" type="Label" parent="SimParameters"]
+[node name="LabelPointsValue" type="Label" parent="SimParameters" unique_id=1331392357]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="ControlSpacer" type="Control" parent="SimParameters"]
+[node name="ControlSpacer" type="Control" parent="SimParameters" unique_id=1399327053]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LabelSpecies" type="Label" parent="SimParameters"]
+[node name="LabelSpecies" type="Label" parent="SimParameters" unique_id=1432853944]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SPECIES"
 horizontal_alignment = 2
 
-[node name="LabelSpeciesValue" type="Label" parent="SimParameters"]
+[node name="LabelSpeciesValue" type="Label" parent="SimParameters" unique_id=547199169]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="ControlSpacer2" type="Control" parent="SimParameters"]
+[node name="ControlSpacer2" type="Control" parent="SimParameters" unique_id=610744807]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LabelSpeed" type="Label" parent="SimParameters"]
+[node name="LabelSpeed" type="Label" parent="SimParameters" unique_id=287463687]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SPEED DT"
 horizontal_alignment = 2
 
-[node name="LabelSpeedValue" type="Label" parent="SimParameters"]
+[node name="LabelSpeedValue" type="Label" parent="SimParameters" unique_id=456625283]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderSpeed" type="HSlider" parent="SimParameters"]
+[node name="SliderSpeed" type="HSlider" parent="SimParameters" unique_id=1120656198]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
-max_value = 0.5
+max_value = 2.0
 step = 0.01
 value = 0.25
 
-[node name="LabelSliderMovementScaling" type="Label" parent="SimParameters"]
+[node name="LabelSliderMovementScaling" type="Label" parent="SimParameters" unique_id=430707421]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "MOVEMENT SCALING"
 horizontal_alignment = 2
 
-[node name="LabelSliderMovementScalingValue" type="Label" parent="SimParameters"]
+[node name="LabelSliderMovementScalingValue" type="Label" parent="SimParameters" unique_id=1628661148]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderMovementScaling" type="HSlider" parent="SimParameters"]
+[node name="SliderMovementScaling" type="HSlider" parent="SimParameters" unique_id=1820036333]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
 min_value = 0.1
-max_value = 4.0
+max_value = 8.0
 step = 0.1
 value = 1.0
 
-[node name="LabelCollideRadius" type="Label" parent="SimParameters"]
+[node name="LabelCollideRadius" type="Label" parent="SimParameters" unique_id=94450761]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "COLLIDE RADIUS"
 horizontal_alignment = 2
 
-[node name="LabelCollideRadiusValue" type="Label" parent="SimParameters"]
+[node name="LabelCollideRadiusValue" type="Label" parent="SimParameters" unique_id=747066276]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="ControlSpacer5" type="Control" parent="SimParameters"]
+[node name="ControlSpacer5" type="Control" parent="SimParameters" unique_id=1450853530]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LabelDamping" type="Label" parent="SimParameters"]
+[node name="LabelDamping" type="Label" parent="SimParameters" unique_id=2144331483]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "DAMPING"
 horizontal_alignment = 2
 
-[node name="LabelDampingValue" type="Label" parent="SimParameters"]
+[node name="LabelDampingValue" type="Label" parent="SimParameters" unique_id=1310695534]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderDampen" type="HSlider" parent="SimParameters"]
+[node name="SliderDampen" type="HSlider" parent="SimParameters" unique_id=1939550873]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -320,20 +352,20 @@ max_value = 1.0
 step = 0.01
 value = 0.95
 
-[node name="LabelMinSpeed" type="Label" parent="SimParameters"]
+[node name="LabelMinSpeed" type="Label" parent="SimParameters" unique_id=982077262]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "MIN SPEED"
 horizontal_alignment = 2
 
-[node name="LabelMinSpeedValue" type="Label" parent="SimParameters"]
+[node name="LabelMinSpeedValue" type="Label" parent="SimParameters" unique_id=4487904]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderMinSpeed" type="HSlider" parent="SimParameters"]
+[node name="SliderMinSpeed" type="HSlider" parent="SimParameters" unique_id=1196315006]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -341,20 +373,20 @@ max_value = 5.0
 step = 0.1
 value = 0.5
 
-[node name="LabelMaxSpeed" type="Label" parent="SimParameters"]
+[node name="LabelMaxSpeed" type="Label" parent="SimParameters" unique_id=1784619948]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "MAX SPEED"
 horizontal_alignment = 2
 
-[node name="LabelMaxSpeedValue" type="Label" parent="SimParameters"]
+[node name="LabelMaxSpeedValue" type="Label" parent="SimParameters" unique_id=1098285743]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderMaxSpeed" type="HSlider" parent="SimParameters"]
+[node name="SliderMaxSpeed" type="HSlider" parent="SimParameters" unique_id=844706394]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -362,20 +394,20 @@ min_value = 2.0
 max_value = 1000.0
 value = 1000.0
 
-[node name="LabelSliderMovementRandomness" type="Label" parent="SimParameters"]
+[node name="LabelSliderMovementRandomness" type="Label" parent="SimParameters" unique_id=1462770617]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "MOVEMENT RANDOMNESS"
 horizontal_alignment = 2
 
-[node name="LabelSliderMovementRandomnessValue" type="Label" parent="SimParameters"]
+[node name="LabelSliderMovementRandomnessValue" type="Label" parent="SimParameters" unique_id=348379631]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderMovementRandomness" type="HSlider" parent="SimParameters"]
+[node name="SliderMovementRandomness" type="HSlider" parent="SimParameters" unique_id=898614106]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -383,20 +415,20 @@ max_value = 0.25
 step = 0.01
 value = 0.01
 
-[node name="LabelCenterPull" type="Label" parent="SimParameters"]
+[node name="LabelCenterPull" type="Label" parent="SimParameters" unique_id=1363141752]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "CENTER PULL"
 horizontal_alignment = 2
 
-[node name="LabelCenterPullValue" type="Label" parent="SimParameters"]
+[node name="LabelCenterPullValue" type="Label" parent="SimParameters" unique_id=45160016]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderCenterPull" type="HSlider" parent="SimParameters"]
+[node name="SliderCenterPull" type="HSlider" parent="SimParameters" unique_id=1384345964]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -404,29 +436,29 @@ max_value = 0.1
 step = 0.01
 value = 0.01
 
-[node name="HSeparator4" type="HSeparator" parent="SimParameters"]
+[node name="HSeparator4" type="HSeparator" parent="SimParameters" unique_id=806235329]
 layout_mode = 2
 
-[node name="HSeparator5" type="HSeparator" parent="SimParameters"]
+[node name="HSeparator5" type="HSeparator" parent="SimParameters" unique_id=1561409496]
 layout_mode = 2
 
-[node name="HSeparator6" type="HSeparator" parent="SimParameters"]
+[node name="HSeparator6" type="HSeparator" parent="SimParameters" unique_id=1606958513]
 layout_mode = 2
 
-[node name="LabelVisionRadius" type="Label" parent="SimParameters"]
+[node name="LabelVisionRadius" type="Label" parent="SimParameters" unique_id=1576899155]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "BOID VISION RADIUS"
 horizontal_alignment = 2
 
-[node name="LabelVisionRadiusValue" type="Label" parent="SimParameters"]
+[node name="LabelVisionRadiusValue" type="Label" parent="SimParameters" unique_id=851301731]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderVisionRadius" type="HSlider" parent="SimParameters"]
+[node name="SliderVisionRadius" type="HSlider" parent="SimParameters" unique_id=84980931]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -435,20 +467,20 @@ max_value = 500.0
 step = 5.0
 value = 100.0
 
-[node name="LabelAlignmentForce" type="Label" parent="SimParameters"]
+[node name="LabelAlignmentForce" type="Label" parent="SimParameters" unique_id=1918775374]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "ALIGNMENT FORCE"
 horizontal_alignment = 2
 
-[node name="LabelAlignmentForceValue" type="Label" parent="SimParameters"]
+[node name="LabelAlignmentForceValue" type="Label" parent="SimParameters" unique_id=463332447]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderAlignmentForce" type="HSlider" parent="SimParameters"]
+[node name="SliderAlignmentForce" type="HSlider" parent="SimParameters" unique_id=1099897589]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -456,20 +488,20 @@ max_value = 2.0
 step = 0.1
 value = 1.0
 
-[node name="LabelCohesionForce" type="Label" parent="SimParameters"]
+[node name="LabelCohesionForce" type="Label" parent="SimParameters" unique_id=296254390]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "COHESION FORCE"
 horizontal_alignment = 2
 
-[node name="LabelCohesionForceValue" type="Label" parent="SimParameters"]
+[node name="LabelCohesionForceValue" type="Label" parent="SimParameters" unique_id=344503948]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderCohesionForce" type="HSlider" parent="SimParameters"]
+[node name="SliderCohesionForce" type="HSlider" parent="SimParameters" unique_id=2087790691]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -477,20 +509,20 @@ max_value = 2.0
 step = 0.1
 value = 1.0
 
-[node name="LabelSeparationForce" type="Label" parent="SimParameters"]
+[node name="LabelSeparationForce" type="Label" parent="SimParameters" unique_id=825430389]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SEPARATION FORCE"
 horizontal_alignment = 2
 
-[node name="LabelSeparationForceValue" type="Label" parent="SimParameters"]
+[node name="LabelSeparationForceValue" type="Label" parent="SimParameters" unique_id=1615447805]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderSeparationForce" type="HSlider" parent="SimParameters"]
+[node name="SliderSeparationForce" type="HSlider" parent="SimParameters" unique_id=1971313177]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -498,29 +530,29 @@ max_value = 3.0
 step = 0.1
 value = 1.0
 
-[node name="HSeparator10" type="HSeparator" parent="SimParameters"]
+[node name="HSeparator10" type="HSeparator" parent="SimParameters" unique_id=265579726]
 layout_mode = 2
 
-[node name="HSeparator11" type="HSeparator" parent="SimParameters"]
+[node name="HSeparator11" type="HSeparator" parent="SimParameters" unique_id=1491607571]
 layout_mode = 2
 
-[node name="HSeparator12" type="HSeparator" parent="SimParameters"]
+[node name="HSeparator12" type="HSeparator" parent="SimParameters" unique_id=1621573551]
 layout_mode = 2
 
-[node name="LabelSenseRadius" type="Label" parent="SimParameters"]
+[node name="LabelSenseRadius" type="Label" parent="SimParameters" unique_id=474577003]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SPECIES INTERACT RADIUS"
 horizontal_alignment = 2
 
-[node name="LabelSenseRadiusValue" type="Label" parent="SimParameters"]
+[node name="LabelSenseRadiusValue" type="Label" parent="SimParameters" unique_id=365937044]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderSenseRadius" type="HSlider" parent="SimParameters"]
+[node name="SliderSenseRadius" type="HSlider" parent="SimParameters" unique_id=704967303]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -529,20 +561,20 @@ max_value = 500.0
 step = 5.0
 value = 70.0
 
-[node name="LabelForceSoftenMultiplier" type="Label" parent="SimParameters"]
+[node name="LabelForceSoftenMultiplier" type="Label" parent="SimParameters" unique_id=698697821]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "FORCE SOFTEN MUL"
 horizontal_alignment = 2
 
-[node name="LabelForceSoftenMultiplierValue" type="Label" parent="SimParameters"]
+[node name="LabelForceSoftenMultiplierValue" type="Label" parent="SimParameters" unique_id=1630557059]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderForceSoftenMultiplier" type="HSlider" parent="SimParameters"]
+[node name="SliderForceSoftenMultiplier" type="HSlider" parent="SimParameters" unique_id=1903870345]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -550,37 +582,37 @@ max_value = 10.0
 step = 0.1
 value = 1.0
 
-[node name="LabelForceSoften" type="Label" parent="SimParameters"]
+[node name="LabelForceSoften" type="Label" parent="SimParameters" unique_id=1704875486]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "FORCE SOFTEN"
 horizontal_alignment = 2
 
-[node name="LabelForceSoftenValue" type="Label" parent="SimParameters"]
+[node name="LabelForceSoftenValue" type="Label" parent="SimParameters" unique_id=308913300]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="ControlSpacer3" type="Control" parent="SimParameters"]
+[node name="ControlSpacer3" type="Control" parent="SimParameters" unique_id=1782763323]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LabelMaxForce" type="Label" parent="SimParameters"]
+[node name="LabelMaxForce" type="Label" parent="SimParameters" unique_id=1183145498]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "MAX FORCE"
 horizontal_alignment = 2
 
-[node name="LabelMaxForceValue" type="Label" parent="SimParameters"]
+[node name="LabelMaxForceValue" type="Label" parent="SimParameters" unique_id=520809017]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SliderMaxForce" type="HSlider" parent="SimParameters"]
+[node name="SliderMaxForce" type="HSlider" parent="SimParameters" unique_id=610109286]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
@@ -588,55 +620,203 @@ max_value = 2000.0
 step = 0.1
 value = 5.0
 
-[node name="HSeparator13" type="HSeparator" parent="SimParameters"]
+[node name="HSeparator13" type="HSeparator" parent="SimParameters" unique_id=2120555955]
 layout_mode = 2
 
-[node name="HSeparator14" type="HSeparator" parent="SimParameters"]
+[node name="HSeparator14" type="HSeparator" parent="SimParameters" unique_id=1420529936]
 layout_mode = 2
 
-[node name="HSeparator15" type="HSeparator" parent="SimParameters"]
+[node name="HSeparator15" type="HSeparator" parent="SimParameters" unique_id=941480877]
 layout_mode = 2
 
-[node name="LabelCamCenter" type="Label" parent="SimParameters"]
+[node name="LabelCamCenter" type="Label" parent="SimParameters" unique_id=949851645]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "CAM CENTER"
 horizontal_alignment = 2
 
-[node name="LabelCamCenterValue" type="Label" parent="SimParameters"]
+[node name="LabelCamCenterValue" type="Label" parent="SimParameters" unique_id=673374283]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="ControlSpacer6" type="Control" parent="SimParameters"]
+[node name="ControlSpacer6" type="Control" parent="SimParameters" unique_id=1047155905]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LabelZoom" type="Label" parent="SimParameters"]
+[node name="LabelZoom" type="Label" parent="SimParameters" unique_id=1940844342]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "ZOOM"
 horizontal_alignment = 2
 
-[node name="LabelZoomValue" type="Label" parent="SimParameters"]
+[node name="LabelZoomValue" type="Label" parent="SimParameters" unique_id=433120736]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="ControlSpacer7" type="Control" parent="SimParameters"]
+[node name="ControlSpacer7" type="Control" parent="SimParameters" unique_id=1956614060]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LabelIntMatrix" type="Label" parent="."]
+[node name="SlimeControls" type="GridContainer" parent="." unique_id=298875014]
+offset_left = 1325.0
+offset_top = 655.0
+offset_right = 1643.0
+offset_bottom = 884.0
+columns = 3
+
+[node name="LabelSlimeHeader" type="Label" parent="SlimeControls" unique_id=395051068]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SLIME CONTROLS"
+horizontal_alignment = 2
+
+[node name="ControlSpacer" type="Control" parent="SlimeControls" unique_id=307620411]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ControlSpacer2" type="Control" parent="SlimeControls" unique_id=58686827]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LabelSensorDistance" type="Label" parent="SlimeControls" unique_id=674393345]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SENSE DISTANCE"
+horizontal_alignment = 2
+
+[node name="LabelSensorDistanceValue" type="Label" parent="SlimeControls" unique_id=711430687]
 unique_name_in_owner = true
-offset_left = 889.0
-offset_top = 713.0
-offset_right = 1210.0
-offset_bottom = 1080.0
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="SliderSensorDistance" type="HSlider" parent="SlimeControls" unique_id=1544026583]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+min_value = 0.1
+max_value = 300.0
+step = 0.1
+value = 15.0
+
+[node name="LabelSensorAngle" type="Label" parent="SlimeControls" unique_id=877196695]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SENSE ANGLE"
+horizontal_alignment = 2
+
+[node name="LabelSensorAngleValue" type="Label" parent="SlimeControls" unique_id=1896637243]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="SliderSensorAngle" type="HSlider" parent="SlimeControls" unique_id=451970572]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+max_value = 90.0
+step = 0.1
+value = 30.0
+
+[node name="LabelTurnStrength" type="Label" parent="SlimeControls" unique_id=818544652]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "TURN STRENGTH"
+horizontal_alignment = 2
+
+[node name="LabelTurnStrengthValue" type="Label" parent="SlimeControls" unique_id=122540320]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="SliderTurnStrength" type="HSlider" parent="SlimeControls" unique_id=1058234291]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+max_value = 180.0
+step = 0.1
+value = 10.0
+
+[node name="LabelDepositAmount" type="Label" parent="SlimeControls" unique_id=1237835589]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "DEPOSIT AMOUNT"
+horizontal_alignment = 2
+
+[node name="LabelDepositAmountValue" type="Label" parent="SlimeControls" unique_id=1815283784]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="SliderDepositAmount" type="HSlider" parent="SlimeControls" unique_id=490292504]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+max_value = 3.0
+step = 0.01
+value = 0.25
+
+[node name="LabelDiffusionRate" type="Label" parent="SlimeControls" unique_id=2105533492]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "DIFFUSION RATE"
+horizontal_alignment = 2
+
+[node name="LabelDiffusionRateValue" type="Label" parent="SlimeControls" unique_id=1491137226]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="SliderDiffusionRate" type="HSlider" parent="SlimeControls" unique_id=693817668]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+max_value = 1.0
+step = 0.001
+value = 0.8
+
+[node name="LabelEvaporationRate" type="Label" parent="SlimeControls" unique_id=659890696]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "EVAP RATE"
+horizontal_alignment = 2
+
+[node name="LabelEvaporationRateValue" type="Label" parent="SlimeControls" unique_id=1463796994]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="SliderEvaporationRate" type="HSlider" parent="SlimeControls" unique_id=1450866437]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+max_value = 1.0
+step = 0.001
+value = 0.1
+
+[node name="LabelIntMatrix" type="Label" parent="." unique_id=1853364154]
+unique_name_in_owner = true
+offset_left = 881.0
+offset_top = 688.0
+offset_right = 1202.0
+offset_bottom = 1055.0
 theme_override_font_sizes/font_size = 12
 text = "1: 1 2 3 4 5
 2: 1 2 3 4 5
@@ -645,6 +825,9 @@ text = "1: 1 2 3 4 5
 5: 1 2 3 4 5"
 horizontal_alignment = 2
 
+[connection signal="pressed" from="DrawFlags/CheckBoxShowParticles" to="." method="_on_check_box_show_particles_pressed"]
+[connection signal="pressed" from="DrawFlags/CheckBox2ShowField" to="." method="_on_check_box_2_show_field_pressed"]
+[connection signal="item_selected" from="DrawFlags/OptionButtonGradients" to="." method="_on_option_button_gradients_item_selected"]
 [connection signal="value_changed" from="SliderSimMix" to="." method="_on_slider_sim_mix_value_changed"]
 [connection signal="pressed" from="SimControls/HBoxContainer/ButtonPauseResume" to="." method="_on_button_pause_resume_pressed"]
 [connection signal="pressed" from="SimControls/HBoxContainer/ButtonRestart" to="." method="_on_button_restart_pressed"]

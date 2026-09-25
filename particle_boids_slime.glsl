@@ -3,6 +3,7 @@
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 shared uint prefix_sum_temp[256]; // adjust size to local_size_x*local_size_y
 shared uint block_base;
+const float EPSILON = 0.0001;
 
 struct MyVec2 { vec2 v; };
 
@@ -10,38 +11,42 @@ struct MyVec2 { vec2 v; };
 layout(rgba32f, set = 0, binding = 0) uniform restrict image2D input_particles; // R=pos.x, G=pos.y, B=vel.x, A=vel.y
 layout(rgba32f, set = 1, binding = 0) uniform restrict image2D output_particles;
 
+// Image buffers with trail data - HDR Scalar value
+layout(rgba32f, set = 0, binding = 1) uniform coherent image2D input_trail; // why use rgba32f ? could try r32f?
+layout(rgba32f, set = 1, binding = 1) uniform coherent image2D output_trail; // why use rgba32f ? could try r32f?
+
 // Per Agent Species/type index
-layout(set = 0, binding = 1, std430) buffer InSpeciesBuffer { int data[]; }   in_species_buffer;
+layout(set = 0, binding = 2, std430) buffer InSpeciesBuffer { int data[]; }   in_species_buffer;
 
 // === Species Interaction Matrix ===
 // (Flattened as species_count x species_count float array)
-layout(set = 0, binding = 2, std430) readonly buffer MatrixBuffer {
+layout(set = 0, binding = 3, std430) readonly buffer MatrixBuffer {
     float data[];
 } interaction_matrix;
 
 // === Spatial Hashing Buffers ===
 // spatial hashing: per-cell counts
-layout(set = 0, binding = 3, std430) buffer CellCountBuffer {
+layout(set = 0, binding = 4, std430) buffer CellCountBuffer {
     uint cell_counts[]; // length = num_cells
 } cell_count_buffer;
 
 // spatial hashing: per-cell offsets
-layout(set = 0, binding = 4, std430) buffer CellOffsetBuffer {
+layout(set = 0, binding = 5, std430) buffer CellOffsetBuffer {
     uint cell_offsets[]; // length = num_cells
 } cell_offset_buffer;
 
 // spatial hashing: sorted indices: list of agent ids grouped by cell
-layout(set = 0, binding = 5, std430) buffer SortedIndexBuffer {
+layout(set = 0, binding = 6, std430) buffer SortedIndexBuffer {
     uint sorted_indices[]; // length = agents_count
 } sorted_index_buffer;
 
 // spatial hashing: agent cells
-layout(set = 0, binding = 6, std430) buffer AgentCellBuffer {
+layout(set = 0, binding = 7, std430) buffer AgentCellBuffer {
     uint data[];  // length = agents_count
 } agent_cell_buffer;
 
 // spatial hashing: cursor
-layout(set = 0, binding = 7, std430) buffer CursorBuffer {
+layout(set = 0, binding = 8, std430) buffer CursorBuffer {
     uint data[];  // length = num_cells
 } cursor_buffer;
 
@@ -72,6 +77,14 @@ layout(push_constant, std430) uniform Params {
     float max_speed;            // Clamp upper speed
     float max_force;            // Limit total applied force
 
+    float sensor_distance;		// for slime mold behavior - 3 sensors
+    float sensor_angle;			// for slime mold behavior - from forward facing
+	float sensor_strength;		// for slime mold behavior - how much is accel affected?
+    float deposit_amount;		// for slime mold behavior - deposit trail
+	
+    float diffusion_rate;		// for slime mold behavior - how much diffusion of trail
+    float evaporation_rate;		// for slime mold behavior - how much evaporation of trail
+
     float cell_size;        // hashing cell size
     float cells_per_row;    // hashing cells per row
 
@@ -100,6 +113,13 @@ vec2 random_dir(uint id, float scale) {
     return vec2(cos(ang), sin(ang)) * scale;
 }
 
+// Random value - cheap hash method
+float random_value(uint id)
+{
+    uint seed = id * 1664525u + 1013904223u;
+    return float(seed & 0x00FFFFFFu) / float(0x01000000u);
+}
+
 // Toroidal distance difference (wrap-around world)
 vec2 toroidal_diff(vec2 a, vec2 b, vec2 world_size) {
     vec2 d = b - a;
@@ -117,6 +137,42 @@ void apply_border(inout vec2 pos, inout vec2 vel) {
     if (pos.y >  half_size) pos.y -= world_size;
 }
 
+vec2 wrap_position(vec2 p)
+{
+    float world_size = params.image_size * params.world_size_mult;
+	
+    float h = world_size * 0.5;
+
+    if (p.x < -h) p.x += world_size;
+    if (p.x >= h) p.x -= world_size;
+
+    if (p.y < -h) p.y += world_size;
+    if (p.y >= h) p.y -= world_size;
+
+    return p;
+}
+float sampleTrail(vec2 worldPos)
+{
+    float world_size = params.image_size * params.world_size_mult;
+    worldPos = wrap_position(worldPos);
+    vec2 uv = (worldPos / world_size) + 0.5;
+    ivec2 size = imageSize(input_trail);
+    ivec2 pixel = ivec2(uv * vec2(size));
+    pixel = clamp(pixel, ivec2(0), size - 1);
+    return imageLoad(input_trail, pixel).r;
+}
+
+float sense(vec2 pos, float heading, float offsetAngle)
+{
+    float ang = heading + offsetAngle;
+    vec2 dir = vec2(
+        cos(ang),
+        sin(ang)
+    );
+    vec2 sensorPos = pos + dir * params.sensor_distance;
+    return sampleTrail(sensorPos);
+}
+
 // Apply softened and capped force
 float apply_force(float f, float dist, float softening, float max_force) {
     float softened_dist = sqrt(dist * dist + softening * softening);
@@ -124,8 +180,121 @@ float apply_force(float f, float dist, float softening, float max_force) {
     return clamp(force_mag, -max_force, max_force);
 }
 
-// Main simulation logic (using spatial grid) + prepare collisions.
-void run_sim() {
+vec2 sense_and_adjust_to_field()
+{
+	if (abs(params.sensor_strength) < EPSILON)
+		return vec2(0.0, 0.0);
+	
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+
+    int id = uv.y * int(params.compute_texture_size) + uv.x;
+
+    if (id >= int(params.agents_count))
+        return vec2(0.0);
+
+    vec4 particle = imageLoad(input_particles, uv);
+
+    vec2 pos = particle.xy;
+    vec2 vel = particle.ba;
+
+    // Derive heading from velocity instead of particle.z.
+    // If velocity is zero, use a deterministic direction.
+    float speed = length(vel);
+
+    float heading;
+
+    if (speed > 0.0001)
+    {
+        heading = atan(vel.y, vel.x);
+    }
+    else
+    {
+        heading = random_value(uint(id)) * 6.28318530718;
+    }
+
+    // Three sensors:
+    // left, forward, right.
+    float left   = sense(pos, heading,  params.sensor_angle);
+    float center = sense(pos, heading,  0.0);
+    float right  = sense(pos, heading, -params.sensor_angle);
+
+    uint rand_seed =
+        uint(id) ^
+        uint(pos.x * 1000.0) ^
+        (uint(pos.y * 1000.0) << 16) ^
+        uint(heading * 10000.0);
+
+    // If forward is weaker than both sides,
+    // randomly choose one of the two directions.
+    if (center < left && center < right)
+    {
+        if (random_value(rand_seed) < 0.5)
+            heading += params.sensor_strength;
+        else
+            heading -= params.sensor_strength;
+    }
+    else if (left > right)
+    {
+        heading += params.sensor_strength;
+    }
+    else if (right > left)
+    {
+        heading -= params.sensor_strength;
+    }
+
+    return vec2(
+        cos(heading),
+        sin(heading)
+    );
+}
+
+void deposit_to_field()
+{
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+
+    int id = uv.y * int(params.compute_texture_size) + uv.x;
+
+    if (id >= int(params.agents_count))
+        return;
+
+    vec4 particle = imageLoad(input_particles, uv);
+    vec2 pos = particle.xy;
+
+    float world_size =
+        params.image_size * params.world_size_mult;
+
+    // Convert world position to wrapped [0,1] coordinates.
+    vec2 wrapped_pos = wrap_position(pos);
+
+    vec2 trail_pos =
+        (wrapped_pos + world_size * 0.5) / world_size;
+
+    ivec2 trail_size = imageSize(input_trail);
+
+    ivec2 trail_uv =
+        ivec2(trail_pos * vec2(trail_size));
+
+    // Safety clamp.
+    trail_uv = clamp(
+        trail_uv,
+        ivec2(0),
+        trail_size - 1
+    );
+
+    float trail =
+        imageLoad(input_trail, trail_uv).r;
+
+    trail += params.deposit_amount;
+
+    imageStore(
+        input_trail,
+        trail_uv,
+        vec4(trail, trail, trail, 1.0)
+    );
+}
+
+// Main particle simulation logic (using spatial grid)
+void run_sim_particles() {
 	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
 	int id = int(uv.y * params.compute_texture_size + uv.x);
 
@@ -146,7 +315,6 @@ void run_sim() {
     vec2 coh   = vec2(0.0);
     vec2 sep   = vec2(0.0);
     vec2 interact = vec2(0.0);
-    vec2 coll = vec2(0.0);
     int neighbor_count = 0;
 
     // Compute world-to-grid conversion
@@ -225,6 +393,9 @@ void run_sim() {
     vec2 f_plife = interact;
     vec2 accel = mix(f_boid, f_plife, params.mix_t);
 	
+	// === SLIME MOLD === sense field and accel towards highest (with some randomness)
+	accel += sense_and_adjust_to_field();
+	
     // Center pull
     if (params.center_attraction > 0.0001) {
         vec2 dir_to_center = safe_normalize(-pos);
@@ -252,8 +423,56 @@ void run_sim() {
     pos += vel * params.dt;
     apply_border(pos, vel);
 
-    // === Output ===
+    // === Particle Output ===
 	imageStore(output_particles, uv, vec4(pos, vel));
+	
+	// === FIELD Output ===
+	deposit_to_field();
+}
+
+void run_sim_field() {
+	// diffusion and evap
+
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(input_trail);
+    if(any(greaterThanEqual(p,size)))
+        return;
+
+	/*
+	// WORKING EXAMPLE - RAW DATA AS RGB
+	float trail = imageLoad(input_trail, p).r * 10.0;
+	trail = 0.5; // hardcode debug
+    imageStore(output_trail,
+               p,
+               vec4(trail,0.0,0.0,1.0));
+	*/
+
+	float sum = 0.0;
+	for(int y=-1;y<=1;y++)
+		for(int x=-1;x<=1;x++)
+		{
+			ivec2 n = p + ivec2(x,y);
+
+			n.x = (n.x + size.x) % size.x;
+			n.y = (n.y + size.y) % size.y;
+
+			sum += imageLoad(input_trail,n).r;
+		}
+
+	float diffusion = clamp(params.diffusion_rate, 0.0, 1.0);
+	float evaporation = clamp(params.evaporation_rate, 0.0, 1.0);
+
+    float trail = mix(imageLoad(input_trail,p).r,
+		sum/9.0,
+		diffusion);
+
+    trail *= (1.0 - evaporation);
+	// trail *= 10.0; // debug brighter
+	
+	// === FIELD Output ===
+    imageStore(output_trail,
+               p,
+               vec4(trail,trail,trail,1.0));
 }
 
 void count_cells() {
@@ -345,7 +564,9 @@ void scatter_sorted_indices() {
 void main() {
 	// ---- GPU processing modes ----
     if (params.run_mode == 0 && params.dt > 0.0) {
-        run_sim();
+        run_sim_particles();
+    } else if (params.run_mode == 1 && params.dt > 0.0) {
+        run_sim_field();
 
 	// ---- GPU preprocessing modes ----
     } else if (params.run_mode == 10 && params.dt > 0.0) {  // COUNT CELLS

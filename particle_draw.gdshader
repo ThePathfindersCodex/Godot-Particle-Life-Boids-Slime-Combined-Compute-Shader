@@ -10,6 +10,12 @@ uniform float zoom;
 varying flat int v_instance_id;
 varying flat int v_species_id;
 
+// NOTE: this shader does not currently support the TRIANGLE particle 
+// shape because it does not rotate the particle towards its heading. 
+// Check the Boids sim repository if you want to grab the code used 
+// to auto-orient the particles and draw them as TRIANGLES
+//		SEE: https://github.com/ThePathfindersCodex/Godot-Boids-Compute-Shader/blob/main/particle_draw.gdshader
+
 void vertex() {
 	int id = INSTANCE_ID;
 	v_instance_id = id;

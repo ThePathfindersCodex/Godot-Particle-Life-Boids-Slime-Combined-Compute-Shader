@@ -8,11 +8,15 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
-config/name="Particle Boids"
+config/name="Particle Boid Slime"
 run/main_scene="uid://dttimedg6wf3x"
-config/features=PackedStringArray("4.5", "Forward Plus")
+config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -21,8 +25,9 @@ StartupManager="*res://startup_manager.gd"
 
 [display]
 
-window/size/viewport_width=1350
+window/size/viewport_width=1650
 window/size/viewport_height=950
+window/size/initial_position_type=0
 window/vsync/vsync_mode=0
 
 [input]
