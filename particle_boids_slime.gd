@@ -37,11 +37,11 @@ var cohesion_force : float = 1.0
 var separation_force : float = 1.0
 
 # SLIME MOLD PARAMETERS
-var sensor_distance : float = 30.0 # TODO: could make this relative to world_size?
-var sensor_angle : float = 15.0 # 30.0 # degrees will be converted to radians before sending to shader
-var sensor_strength : float =  2.0 # 10.0 # degrees will be converted to radians before sending to shader
-var deposit_amount : float = 0.25
-var diffusion_rate : float = 0.95
+var sensor_distance : float = 35.0 # TODO: could make this relative to world_size?
+var sensor_angle : float = 30.0 # 30.0 # degrees will be converted to radians before sending to shader
+var sensor_strength : float =  0.3
+var deposit_amount : float = 0.3
+var diffusion_rate : float = 0.9
 var evaporation_rate : float = 0.015
 
 # FORCE ADJUSTMENTS

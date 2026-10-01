@@ -79,7 +79,7 @@ layout(push_constant, std430) uniform Params {
 
     float sensor_distance;		// for slime mold behavior - 3 sensors
     float sensor_angle;			// for slime mold behavior - from forward facing
-	float sensor_strength;		// for slime mold behavior - how much is accel affected?
+	float sensor_strength;		// for slime mold behavior - how strong is the slime steering?
     float deposit_amount;		// for slime mold behavior - deposit trail
 	
     float diffusion_rate;		// for slime mold behavior - how much diffusion of trail
@@ -114,11 +114,11 @@ vec2 random_dir(uint id, float scale) {
 }
 
 // Random value - cheap hash method
-float random_value(uint id)
-{
-    uint seed = id * 1664525u + 1013904223u;
-    return float(seed & 0x00FFFFFFu) / float(0x01000000u);
-}
+//float random_value(uint id)
+//{
+//   uint seed = id * 1664525u + 1013904223u;
+//   return float(seed & 0x00FFFFFFu) / float(0x01000000u);
+//}
 
 // Toroidal distance difference (wrap-around world)
 vec2 toroidal_diff(vec2 a, vec2 b, vec2 world_size) {
@@ -182,9 +182,9 @@ float apply_force(float f, float dist, float softening, float max_force) {
 
 vec2 sense_and_adjust_to_field()
 {
-	if (abs(params.sensor_strength) < EPSILON)
-		return vec2(0.0, 0.0);
-	
+    if (abs(params.sensor_strength) < EPSILON)
+        return vec2(0.0);
+
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
 
     int id = uv.y * int(params.compute_texture_size) + uv.x;
@@ -197,55 +197,40 @@ vec2 sense_and_adjust_to_field()
     vec2 pos = particle.xy;
     vec2 vel = particle.ba;
 
-    // Derive heading from velocity instead of particle.z.
-    // If velocity is zero, use a deterministic direction.
     float speed = length(vel);
 
-    float heading;
+    if (speed <= EPSILON)
+        return vec2(0.0);
 
-    if (speed > 0.0001)
+    vec2 current_dir = vel / speed;
+    float heading = atan(current_dir.y, current_dir.x);
+
+    float left = sense(pos, heading, params.sensor_angle);
+    float center = sense(pos, heading, 0.0);
+    float right = sense(pos, heading, -params.sensor_angle);
+
+    vec2 desired_dir = current_dir;
+
+    if (center >= left && center >= right)
     {
-        heading = atan(vel.y, vel.x);
-    }
-    else
-    {
-        heading = random_value(uint(id)) * 6.28318530718;
-    }
-
-    // Three sensors:
-    // left, forward, right.
-    float left   = sense(pos, heading,  params.sensor_angle);
-    float center = sense(pos, heading,  0.0);
-    float right  = sense(pos, heading, -params.sensor_angle);
-
-    uint rand_seed =
-        uint(id) ^
-        uint(pos.x * 1000.0) ^
-        (uint(pos.y * 1000.0) << 16) ^
-        uint(heading * 10000.0);
-
-    // If forward is weaker than both sides,
-    // randomly choose one of the two directions.
-    if (center < left && center < right)
-    {
-        if (random_value(rand_seed) < 0.5)
-            heading += params.sensor_strength;
-        else
-            heading -= params.sensor_strength;
+        desired_dir = current_dir;
     }
     else if (left > right)
     {
-        heading += params.sensor_strength;
+        desired_dir = vec2(
+            cos(heading + params.sensor_angle),
+            sin(heading + params.sensor_angle)
+        );
     }
-    else if (right > left)
+    else
     {
-        heading -= params.sensor_strength;
+        desired_dir = vec2(
+            cos(heading - params.sensor_angle),
+            sin(heading - params.sensor_angle)
+        );
     }
 
-    return vec2(
-        cos(heading),
-        sin(heading)
-    );
+    return (desired_dir - current_dir) * params.sensor_strength;
 }
 
 void deposit_to_field()
@@ -285,7 +270,9 @@ void deposit_to_field()
         imageLoad(input_trail, trail_uv).r;
 
     trail += params.deposit_amount;
+    //trail += params.deposit_amount * params.dt;;
 
+	// we lose some deposits here due to lack of atomics - maybe fix later
     imageStore(
         input_trail,
         trail_uv,
@@ -392,9 +379,13 @@ void run_sim_particles() {
     vec2 f_boid = boid_force;
     vec2 f_plife = interact;
     vec2 accel = mix(f_boid, f_plife, params.mix_t);
-	
-	// === SLIME MOLD === sense field and accel towards highest (with some randomness)
-	accel += sense_and_adjust_to_field();
+
+	// === SLIME MOLD ===
+	if (params.sensor_strength > 0.0)
+	{
+		vec2 f_trail = sense_and_adjust_to_field();	
+		accel += f_trail;
+	}
 	
     // Center pull
     if (params.center_attraction > 0.0001) {

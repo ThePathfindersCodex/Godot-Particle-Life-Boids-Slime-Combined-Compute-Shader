@@ -74,10 +74,10 @@ func _process(_delta):
 	%LabelSliderMovementScalingValue.text = str(snapped(%ParticleBoidsSlime.movement_scaling,.1))
 	
 	%LabelSensorDistanceValue.text = str(snapped(%ParticleBoidsSlime.sensor_distance,.1))
-	%LabelSensorAngleValue.text = str(snapped(%ParticleBoidsSlime.sensor_angle,.1))
+	%LabelSensorAngleValue.text = str(snapped(%ParticleBoidsSlime.sensor_angle,1))
 	%LabelTurnStrengthValue.text = str(snapped(%ParticleBoidsSlime.sensor_strength,.1))
-	%LabelDepositAmountValue.text = str(snapped(%ParticleBoidsSlime.deposit_amount,.01))
-	%LabelDiffusionRateValue.text = str(snapped(%ParticleBoidsSlime.diffusion_rate,.001))
+	%LabelDepositAmountValue.text = str(snapped(%ParticleBoidsSlime.deposit_amount,.1))
+	%LabelDiffusionRateValue.text = str(snapped(%ParticleBoidsSlime.diffusion_rate,.1))
 	%LabelEvaporationRateValue.text = str(snapped(%ParticleBoidsSlime.evaporation_rate,.001))
 	
 	# SET INTERACTION MATRIX TEXT

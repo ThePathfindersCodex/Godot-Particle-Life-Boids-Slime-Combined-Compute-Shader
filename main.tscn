@@ -217,7 +217,7 @@ unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 selected = 2
-item_count = 5
+item_count = 4
 popup/item_0/text = "256"
 popup/item_0/id = 0
 popup/item_1/text = "512"
@@ -226,8 +226,6 @@ popup/item_2/text = "5120"
 popup/item_2/id = 2
 popup/item_3/text = "15360"
 popup/item_3/id = 3
-popup/item_4/text = "25600"
-popup/item_4/id = 4
 
 [node name="SimParameters" type="GridContainer" parent="." unique_id=1681967463]
 offset_left = 843.0
@@ -701,9 +699,7 @@ horizontal_alignment = 2
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
-min_value = 0.1
-max_value = 300.0
-step = 0.1
+max_value = 500.0
 value = 15.0
 
 [node name="LabelSensorAngle" type="Label" parent="SlimeControls" unique_id=877196695]
@@ -724,7 +720,6 @@ unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
 max_value = 90.0
-step = 0.1
 value = 30.0
 
 [node name="LabelTurnStrength" type="Label" parent="SlimeControls" unique_id=818544652]
@@ -744,9 +739,9 @@ horizontal_alignment = 2
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
-max_value = 180.0
+max_value = 10.0
 step = 0.1
-value = 10.0
+value = 0.2
 
 [node name="LabelDepositAmount" type="Label" parent="SlimeControls" unique_id=1237835589]
 layout_mode = 2
@@ -766,8 +761,8 @@ unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
 max_value = 3.0
-step = 0.01
-value = 0.25
+step = 0.1
+value = 0.3
 
 [node name="LabelDiffusionRate" type="Label" parent="SlimeControls" unique_id=2105533492]
 layout_mode = 2
@@ -787,7 +782,7 @@ unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
 max_value = 1.0
-step = 0.001
+step = 0.1
 value = 0.8
 
 [node name="LabelEvaporationRate" type="Label" parent="SlimeControls" unique_id=659890696]
