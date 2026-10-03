@@ -224,7 +224,7 @@ popup/item_1/text = "512"
 popup/item_1/id = 1
 popup/item_2/text = "5120"
 popup/item_2/id = 2
-popup/item_3/text = "15360"
+popup/item_3/text = "10240"
 popup/item_3/id = 3
 
 [node name="SimParameters" type="GridContainer" parent="." unique_id=1681967463]
@@ -389,8 +389,7 @@ unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
 min_value = 2.0
-max_value = 1000.0
-value = 1000.0
+value = 5.0
 
 [node name="LabelSliderMovementRandomness" type="Label" parent="SimParameters" unique_id=1462770617]
 layout_mode = 2
@@ -720,7 +719,7 @@ unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
 max_value = 90.0
-value = 30.0
+value = 15.0
 
 [node name="LabelTurnStrength" type="Label" parent="SlimeControls" unique_id=818544652]
 layout_mode = 2
@@ -739,9 +738,9 @@ horizontal_alignment = 2
 unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
-max_value = 10.0
+max_value = 1.0
 step = 0.1
-value = 0.2
+value = 0.3
 
 [node name="LabelDepositAmount" type="Label" parent="SlimeControls" unique_id=1237835589]
 layout_mode = 2

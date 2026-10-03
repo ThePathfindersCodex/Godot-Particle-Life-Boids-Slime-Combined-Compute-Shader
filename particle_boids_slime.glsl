@@ -182,9 +182,6 @@ float apply_force(float f, float dist, float softening, float max_force) {
 
 vec2 sense_and_adjust_to_field()
 {
-    if (abs(params.sensor_strength) < EPSILON)
-        return vec2(0.0);
-
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
 
     int id = uv.y * int(params.compute_texture_size) + uv.x;
@@ -214,6 +211,7 @@ vec2 sense_and_adjust_to_field()
     if (center >= left && center >= right)
     {
         desired_dir = current_dir;
+		// note - consider using a random left or right dir, instead of straight forward
     }
     else if (left > right)
     {
@@ -230,7 +228,7 @@ vec2 sense_and_adjust_to_field()
         );
     }
 
-    return (desired_dir - current_dir) * params.sensor_strength;
+    return (desired_dir - current_dir);
 }
 
 void deposit_to_field()
@@ -381,11 +379,10 @@ void run_sim_particles() {
     vec2 accel = mix(f_boid, f_plife, params.mix_t);
 
 	// === SLIME MOLD ===
-	if (params.sensor_strength > 0.0)
-	{
-		vec2 f_trail = sense_and_adjust_to_field();	
-		accel += f_trail;
-	}
+	vec2 f_trail = sense_and_adjust_to_field();	
+	//accel += f_trail;
+	//accel = mix(accel, f_trail, 0.5);
+	accel = mix(accel, f_trail, params.sensor_strength);
 	
     // Center pull
     if (params.center_attraction > 0.0001) {
