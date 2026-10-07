@@ -76,6 +76,8 @@ layout(push_constant, std430) uniform Params {
     float min_speed;            // Clamp lower speed
     float max_speed;            // Clamp upper speed
     float max_force;            // Limit total applied force
+	
+	float minimum_distance;		// Distance where repulsion force starts to take effect
 
     float sensor_distance;		// for slime mold behavior - 3 sensors
     float sensor_angle;			// for slime mold behavior - from forward facing
@@ -301,6 +303,8 @@ void run_sim_particles() {
     vec2 sep   = vec2(0.0);
     vec2 interact = vec2(0.0);
     int neighbor_count = 0;
+    vec2 collision_force = vec2(0.0);
+    float closest_dist = params.minimum_distance;
 
     // Compute world-to-grid conversion
     float world_size_f = params.image_size * params.world_size_mult;
@@ -360,6 +364,18 @@ void run_sim_particles() {
                     vec2 dir = diff / dist;
                     interact += dir * apply_force(f, dist, params.force_softening, params.max_force);
                 }
+				
+                // Minimum-distance collision approximation
+                if (params.minimum_distance > 0.0 && dist < closest_dist) {
+                    closest_dist = dist;
+
+                    float t = 1.0 - dist / params.minimum_distance;
+                    // collision_force = -diff / dist * (t * t); // quadratic
+                    // collision_force = -diff / dist * t; // linear
+                    collision_force = -diff / dist * sqrt(t); // sqr root
+                    //collision_force = -diff / dist * 1.0; // constant
+                }
+				
             }
         }
     }
@@ -392,6 +408,11 @@ void run_sim_particles() {
 
     // Add small random drift
     accel += random_dir(id, params.movement_randomness);
+	
+    // Minimum-distance collision approximation
+    accel += collision_force;
+	
+	// Cap force
     accel = limit(accel, params.max_force);
 	
 	// Global accel scaling

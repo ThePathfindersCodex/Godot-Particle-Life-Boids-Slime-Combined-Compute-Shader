@@ -14,6 +14,7 @@ var slider_bindings = {
 	"%SliderForceSoftenMultiplier": "force_softening_mul",
 	"%SliderCenterPull": "center_attraction",
 	"%SliderMaxForce": "max_force",
+	"%SliderMinDistance": "min_distance",
 	"%SliderVisionRadius": "boid_vision_radius",
 	"%SliderAlignmentForce": "alignment_force",
 	"%SliderCohesionForce": "cohesion_force",
@@ -55,13 +56,14 @@ func _process(_delta):
 	# SET READOUT VALUES
 	%LabelPointsValue.text = str(snapped(%ParticleBoidsSlime.agent_count,1))
 	%LabelSpeciesValue.text = str(snapped(%ParticleBoidsSlime.species_count,1))
-	%LabelSpeedValue.text = str(snapped(%ParticleBoidsSlime.dt,.01))
+	%LabelSpeedValue.text = str(snapped(%ParticleBoidsSlime.dt,.1))
 	%LabelDampingValue.text = str(snapped(%ParticleBoidsSlime.damping,.01))
 	%LabelSenseRadiusValue.text = str(snapped(%ParticleBoidsSlime.species_interaction_radius,.01))
 	%LabelForceSoftenMultiplierValue.text = str(snapped(%ParticleBoidsSlime.force_softening_mul,.1))
 	%LabelForceSoftenValue.text = str(snapped(%ParticleBoidsSlime.force_softening,.01))
 	%LabelCenterPullValue.text = str(snapped(%ParticleBoidsSlime.center_attraction,.01))
 	%LabelMaxForceValue.text = str(snapped(%ParticleBoidsSlime.max_force,.01))
+	%LabelMinDistanceValue.text = str(snapped(%ParticleBoidsSlime.min_distance,1))
 	%LabelCamCenterValue.text = "("+str(snapped(%ParticleBoidsSlime.camera_center.x,.1))+ ", " + str(snapped(%ParticleBoidsSlime.camera_center.y,.1)) + ")"
 	%LabelZoomValue.text = str(snapped(%ParticleBoidsSlime.zoom,.01))
 	%LabelVisionRadiusValue.text = str(snapped(%ParticleBoidsSlime.boid_vision_radius,1))

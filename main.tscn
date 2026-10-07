@@ -286,8 +286,8 @@ unique_name_in_owner = true
 layout_mode = 2
 mouse_force_pass_scroll_events = false
 max_value = 2.0
-step = 0.01
-value = 0.25
+step = 0.1
+value = 1.0
 
 [node name="LabelSliderMovementScaling" type="Label" parent="SimParameters" unique_id=430707421]
 layout_mode = 2
@@ -310,6 +310,24 @@ min_value = 0.1
 max_value = 8.0
 step = 0.1
 value = 1.0
+
+[node name="LabelMinDistance" type="Label" parent="SimParameters" unique_id=548643058]
+layout_mode = 2
+text = "MIN DISTANCE"
+horizontal_alignment = 2
+
+[node name="LabelMinDistanceValue" type="Label" parent="SimParameters" unique_id=1574565908]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0"
+horizontal_alignment = 2
+
+[node name="SliderMinDistance" type="HSlider" parent="SimParameters" unique_id=1647082339]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+max_value = 50.0
+value = 5.0
 
 [node name="LabelCollideRadius" type="Label" parent="SimParameters" unique_id=94450761]
 layout_mode = 2
